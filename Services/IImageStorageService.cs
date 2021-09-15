@@ -7,6 +7,6 @@ namespace ImageUpload.Services
     {
         string GenerateUploadUrl();
 
-        Task<int> UploadImage(IFormFile file);
+        Task<int?> UploadImage(IFormFile file);
     }
 }

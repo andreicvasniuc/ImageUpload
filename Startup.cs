@@ -1,16 +1,11 @@
 using ImageUpload.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ImageUpload
 {
@@ -28,8 +23,9 @@ namespace ImageUpload
         {
             services.AddControllers();
 
-            var storageService = new ImageStorageService(Configuration.GetConnectionString("StorageAccount"));
-            services.AddSingleton<IImageStorageService>(storageService);
+            services.AddSingleton<IImageStorageService, ImageStorageService>(provider =>
+                new ImageStorageService(connectionString: Environment.GetEnvironmentVariable("StorageAccount"), logger: provider.GetService<ILogger<ImageStorageService>>())
+            );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

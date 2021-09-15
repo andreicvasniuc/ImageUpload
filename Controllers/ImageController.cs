@@ -31,6 +31,6 @@ namespace ImageUpload.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<int> Upload(IFormFile file) => await _imageStorageService.UploadImage(file);
+        public async Task<int?> Upload(IFormFile file) => await _imageStorageService.UploadImage(file);
     }
 }
