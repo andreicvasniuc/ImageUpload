@@ -20,23 +20,47 @@ namespace ImageUpload.Services
 
         string IImageStorageService.GenerateUploadUrl()
         {
-            if (_container == null) return null;
+            try
+            {
+                if (_container == null) return null;
 
-            var blobClient = _container.GetBlobClient(blobName: $"image-{DateTime.Now.Ticks}");
-            return blobClient.Uri.AbsoluteUri;
+                var blobClient = _container.GetBlobClient(blobName: $"image-{DateTime.Now.Ticks}");
+                return blobClient.Uri.AbsoluteUri;
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(message: ex.Message);
+                return null;
+            }
         }
 
         async Task<int?> IImageStorageService.UploadImage(IFormFile file)
         {
-            if (file is null) throw new ArgumentNullException(nameof(file));
-            if (_container == null) return null;
+            try
+            {
+                if (file is null) throw new ArgumentNullException(nameof(file));
+                if (_container == null) return null;
 
-            var blobClient = _container.GetBlobClient(blobName: file.FileName);
+                var blob = _container.GetBlobClient(blobName: file.FileName);
 
-            var options = new BlobUploadOptions { HttpHeaders = new BlobHttpHeaders { ContentType = file.ContentType, ContentDisposition = file.ContentDisposition } };
-            var response = await blobClient.UploadAsync(content: file.OpenReadStream(), options: options);
+                var options = new BlobUploadOptions
+                {
+                    HttpHeaders = new BlobHttpHeaders
+                    {
+                        ContentType = file.ContentType,
+                        ContentDisposition = file.ContentDisposition
+                    }
+                };
+                var response = await blob.UploadAsync(content: file.OpenReadStream(), options: options);
 
-            return response.GetRawResponse().Status;
+                return response.GetRawResponse().Status;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(message: ex.Message);
+                return null;
+            }
         }
 
         private BlobContainerClient InstantiateImagesContainer(string connectionString)
@@ -47,8 +71,10 @@ namespace ImageUpload.Services
 
                 var container = new BlobContainerClient(connectionString, blobContainerName: "images");
                 container.CreateIfNotExists(publicAccessType: PublicAccessType.BlobContainer);
+
                 return container;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(message: ex.Message);
                 return null;

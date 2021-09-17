@@ -2,7 +2,6 @@
 using ImageUpload.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -12,12 +11,10 @@ namespace ImageUpload.Controllers
     [Route("api/[controller]")]
     public class ImageController : ControllerBase
     {
-        private readonly ILogger<ImageController> _logger;
         private readonly IImageStorageService _imageStorageService;
 
-        public ImageController(ILogger<ImageController> logger, IImageStorageService imageStorageService)
+        public ImageController(IImageStorageService imageStorageService)
         {
-            _logger = logger;
             _imageStorageService = imageStorageService;
         }
 
